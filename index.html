@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic In — Kasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF7EF;
+    --surface:#FFFFFF;
+    --surface-tint:#F4F0E4;
+    --ink:#232B1E;
+    --muted:#6C6F5F;
+    --faint:#9A9C8C;
+    --border:#E4DFCF;
+    --primary:#2F5233;
+    --primary-dark:#1D3620;
+    --primary-tint:#E7EFE3;
+    --gold:#AE7F26;
+    --gold-tint:#F6EDD9;
+    --rose:#B14D67;
+    --rose-tint:#F7E7EC;
+    --danger:#B03A2E;
+    --danger-tint:#FBEAE7;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(35,43,30,0.06), 0 4px 14px rgba(35,43,30,0.05);
+    --font-display:'Fraunces',serif;
+    --font-body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-tint);}
+
+  .app{display:flex;min-height:100vh;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+    background:var(--primary-dark);
+    color:#F1EEDF;
+    padding:24px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .brand{padding:0 8px;}
+  .brand-mark{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:0.2px;
+    color:#F7F4E6;
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+  }
+  .brand-mark .dot{color:var(--gold);font-size:22px;line-height:0;}
+  .brand-sub{font-size:11px;color:#B9C2AE;margin-top:3px;letter-spacing:0.6px;text-transform:uppercase;}
+
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:8px;
+    color:#D6DECB;
+    cursor:pointer;
+    font-size:13.5px;
+    font-weight:500;
+    border-left:2px solid transparent;
+    transition:background .15s ease, color .15s ease;
+  }
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:0.85;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#F1EEDF;}
+  .nav-item.active{background:rgba(255,255,255,0.1);color:#FFFFFF;border-left-color:var(--gold);}
+  .nav-item.active svg{opacity:1;}
+
+  .sidebar-foot{margin-top:auto;padding:10px 8px 0;border-top:1px solid rgba(255,255,255,0.1);}
+  .sidebar-foot p{font-size:10.5px;color:#8E9682;margin:10px 0 0;line-height:1.5;}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;padding:26px 34px 60px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+  .view-title{font-family:var(--font-display);font-weight:600;font-size:26px;color:var(--primary-dark);margin:0;}
+  .view-desc{color:var(--muted);font-size:13px;margin:4px 0 0;}
+  .view-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .today{font-size:12.5px;color:var(--muted);text-transform:capitalize;}
+
+  /* buttons */
+  button{font-family:var(--font-body);cursor:pointer;}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:9px 15px;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);font-size:13px;font-weight:600;
+    transition:border-color .15s, background .15s;
+  }
+  .btn:hover{border-color:var(--primary);}
+  .btn svg{width:14px;height:14px;}
+  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--muted);padding:6px 8px;}
+  .btn-ghost:hover{background:var(--surface-tint);color:var(--ink);}
+  .btn-danger{color:var(--danger);}
+  .btn-danger:hover{border-color:var(--danger);background:var(--danger-tint);}
+  .btn-sm{padding:5px 9px;font-size:12px;}
+
+  /* cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);}
+  .card-pad{padding:18px 20px;}
+
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:24px;}
+  .metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+  .metric-label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
+  .metric-value{font-family:var(--font-display);font-size:26px;font-weight:600;color:var(--primary-dark);margin-top:6px;}
+  .metric-value.rose{color:var(--rose);}
+  .metric-sub{font-size:11.5px;color:var(--faint);margin-top:3px;}
+
+  /* forms */
+  .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding:16px 18px;background:var(--surface-tint);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;}
+  .field{display:flex;flex-direction:column;gap:4px;min-width:130px;}
+  .field.grow{flex:1;min-width:220px;}
+  .field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    font-family:var(--font-body);
+    border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13.5px;
+    background:#fff;color:var(--ink);width:100%;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-tint);}
+  .hint{font-size:11.5px;color:var(--faint);margin-top:2px;}
+  .hint.ok{color:var(--primary);}
+  .hint.bad{color:var(--danger);}
+
+  /* table */
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{
+    text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;
+    color:var(--muted);background:var(--surface-tint);padding:10px 12px;border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#FCFBF6;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+  tfoot td{padding:11px 12px;font-weight:700;background:var(--primary-tint);color:var(--primary-dark);border-top:2px solid var(--primary);}
+  .neg{color:var(--danger);}
+  .pos{color:var(--primary);}
+  .row-actions{display:flex;gap:4px;}
+  .empty-row td{padding:34px 12px;text-align:center;color:var(--faint);font-size:13px;}
+
+  .search-wrap{position:relative;max-width:340px;}
+  .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--faint);}
+  .search-wrap input{padding-left:32px;}
+
+  .table-scroll{max-height:560px;overflow:auto;}
+
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+  .badge-gold{background:var(--gold-tint);color:#7A5A17;}
+  .badge-rose{background:var(--rose-tint);color:#8A3A50;}
+
+  .print-only{display:none;}
+
+  @media print{
+    .sidebar,.no-print{display:none !important;}
+    .main{padding:0;}
+    body{background:#fff;}
+    .print-only{display:block;margin-bottom:14px;}
+    .print-only .p-shop{font-family:var(--font-display);font-size:20px;font-weight:600;color:var(--primary-dark);}
+    .print-only .p-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+    .table-wrap{border:none;box-shadow:none;}
+    .table-scroll{max-height:none;overflow:visible;}
+    input[data-stvarno-datum]{border:none;background:transparent;padding:0;color:var(--ink);}
+  }
+
+  @media (max-width:820px){
+    .sidebar{width:76px;padding:20px 8px;}
+    .brand-sub,.nav-item span,.sidebar-foot{display:none;}
+    .nav-item{justify-content:center;}
+    .main{padding:20px 16px 50px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">Magic In<span class="dot">·</span></div>
+      <div class="brand-sub">Kasa &amp; evidencija</div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-item" data-view="pregled">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l3-3 4 4 6-7 5 5"/><path d="M3 20h18"/></svg>
+        <span>Pregled</span>
+      </div>
+      <div class="nav-item" data-view="sifrarnik">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span>Šifrarnik</span>
+      </div>
+      <div class="nav-item" data-view="lager">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
+        <span>Lager lista</span>
+      </div>
+      <div class="nav-item" data-view="otpis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+        <span>Otpis</span>
+      </div>
+      <div class="nav-item" data-view="promet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+        <span>Dnevni promet</span>
+      </div>
+      <div class="nav-item" data-view="univerzalna">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 10h18M9 10v10"/></svg>
+        <span>Univerzalna tabela</span>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <p>Podaci se čuvaju lokalno u ovom nalogu i vidljivi su samo vama.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- PREGLED -->
+    <section class="view" id="view-pregled">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Pregled</h1>
+          <p class="view-desc">Trenutno stanje cvećare Magic In</p>
+        </div>
+        <div class="today" id="todayLabel"></div>
+      </div>
+      <div class="metrics" id="metricsGrid"></div>
+      <div class="card card-pad">
+        <div style="font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--primary-dark);margin-bottom:4px;">Dobrodošli</div>
+        <p style="color:var(--muted);font-size:13px;margin:0;">Koristite meni sa leve strane za rad sa šifarnikom artikala, lager listom, otpisom, dnevnim prometom kase i univerzalnom tabelom za štampu. Sve izmene se čuvaju automatski.</p>
+      </div>
+    </section>
+
+    <!-- SIFRARNIK -->
+    <section class="view" id="view-sifrarnik">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Šifrarnik</h1>
+          <p class="view-desc"><span id="sifrarnikCount">0</span> artikala u bazi</p>
+        </div>
+        <div class="view-actions no-print">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="sifrarnikSearch" placeholder="Pretraga po nazivu ili šifri">
+          </div>
+          <button class="btn" data-action="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a1 1 0 01-1-1v-4a1 1 0 011-1h16a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
+            Štampaj
+          </button>
+        </div>
+      </div>
+
+      <div class="print-only"><div class="p-shop">Magic In — Šifrarnik artikala</div><div class="p-meta" id="printMetaSif"></div></div>
+
+      <div class="form-row no-print">
+        <div class="field">
+          <label>Šifra</label>
+          <input type="number" id="newSifra" placeholder="npr. 1163">
+        </div>
+        <div class="field grow">
+          <label>Naziv artikla</label>
+          <input type="text" id="newNaziv" placeholder="npr. RUZA HOLANDIJA">
+        </div>
+        <div class="field">
+          <label>Cena (bez PDV)</label>
+          <input type="number" id="newCena" step="0.01" placeholder="0.00">
+        </div>
+        <button class="btn btn-primary" data-action="addArtikal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Dodaj artikal
+        </button>
+      </div>
+      <div id="sifrarnikMsg" class="hint" style="margin:-8px 0 12px;"></div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th style="width:90px;">Šifra</th><th>Naziv artikla</th><th class="num" style="width:140px;">Cena (bez PDV)</th><th class="no-print" style="width:90px;"></th></tr></thead>
+            <tbody id="sifrarnikBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAGER -->
+    <section class="view" id="view-lager">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Lager lista</h1>
+          <p class="view-desc">Radne zalihe i automatsko finansijsko stanje</p>
+        </div>
+        <div class="view-actions no-print">
+          <button class="btn" data-action="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a1 1 0 01-1-1v-4a1 1 0 011-1h16a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
+            Štampaj
+          </button>
+        </div>
+      </div>
+
+      <div class="print-only"><div class="p-shop">Magic In — Lager lista (radne zalihe)</div><div class="p-meta" id="printMetaLager"></div></div>
+
+      <div class="form-row no-print">
+        <div class="field grow">
+          <label>Artikal (upišite naziv ili šifru)</label>
+          <input type="text" id="lagerArtikal" list="itemsDatalist" placeholder="Počnite da kucate naziv ili šifru...">
+          <div class="hint" id="lagerHint"></div>
+        </div>
+        <div class="field">
+          <label>Količina na stanju</label>
+          <input type="number" id="lagerKolicina" min="0" step="1" placeholder="0">
+        </div>
+        <button class="btn btn-primary" data-action="addLagerStavka">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Unesi / ažuriraj stanje
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width:90px;">Šifra</th><th>Naziv artikla</th>
+              <th class="num" style="width:120px;">Cena</th>
+              <th class="num" style="width:110px;">Količina</th>
+              <th class="num" style="width:150px;">Vrednost robe</th>
+              <th class="no-print" style="width:60px;"></th>
+            </tr></thead>
+            <tbody id="lagerBody"></tbody>
+            <tfoot><tr><td colspan="4" style="text-align:right;">UKUPNO — finansijsko stanje lagera</td><td class="num" id="lagerTotal">0,00 din.</td><td class="no-print"></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- OTPIS -->
+    <section class="view" id="view-otpis">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Otpis</h1>
+          <p class="view-desc">Evidencija artikala koji se otpisuju</p>
+        </div>
+        <div class="view-actions no-print">
+          <button class="btn" data-action="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a1 1 0 01-1-1v-4a1 1 0 011-1h16a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
+            Štampaj
+          </button>
+        </div>
+      </div>
+
+      <div class="print-only"><div class="p-shop">Magic In — Otpis artikala</div><div class="p-meta" id="printMetaOtpis"></div></div>
+
+      <div class="form-row no-print">
+        <div class="field">
+          <label>Datum</label>
+          <input type="date" id="otpisDatum">
+        </div>
+        <div class="field grow">
+          <label>Artikal (upišite naziv ili šifru)</label>
+          <input type="text" id="otpisArtikal" list="itemsDatalist" placeholder="Počnite da kucate naziv ili šifru...">
+          <div class="hint" id="otpisHint"></div>
+        </div>
+        <div class="field">
+          <label>Količina</label>
+          <input type="number" id="otpisKolicina" min="1" step="1" placeholder="1">
+        </div>
+        <div class="field grow">
+          <label>Razlog otpisa</label>
+          <input type="text" id="otpisRazlog" placeholder="npr. uvenulo, oštećeno...">
+        </div>
+        <button class="btn btn-primary" data-action="addOtpis">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Evidentiraj otpis
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width:100px;">Datum</th><th style="width:90px;">Šifra</th><th>Naziv artikla</th>
+              <th class="num" style="width:90px;">Količina</th><th class="num" style="width:110px;">Cena</th>
+              <th class="num" style="width:130px;">Vrednost otpisa</th><th>Razlog</th>
+              <th class="no-print" style="width:60px;"></th>
+            </tr></thead>
+            <tbody id="otpisBody"></tbody>
+            <tfoot><tr><td colspan="5" style="text-align:right;">UKUPNO otpisana vrednost</td><td class="num" id="otpisTotal">0,00 din.</td><td></td><td class="no-print"></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROMET -->
+    <section class="view" id="view-promet">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Dnevni promet</h1>
+          <p class="view-desc">Sanja ili Ranka unose svaki prodati artikal — pazar se sabira automatski</p>
+        </div>
+        <div class="view-actions no-print">
+          <button class="btn" data-action="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a1 1 0 01-1-1v-4a1 1 0 011-1h16a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
+            Štampaj
+          </button>
+        </div>
+      </div>
+
+      <div class="print-only"><div class="p-shop">Magic In — Dnevni promet kase</div><div class="p-meta" id="printMetaPromet"></div></div>
+
+      <div class="form-row no-print">
+        <div class="field">
+          <label>Datum</label>
+          <input type="date" id="prodajaDatum">
+        </div>
+        <div class="field">
+          <label>Radnik</label>
+          <select id="prodajaRadnik">
+            <option value="Sanja">Sanja</option>
+            <option value="Ranka">Ranka</option>
+            <option value="__drugi">Drugi radnik...</option>
+          </select>
+        </div>
+        <div class="field" id="prodajaRadnikDrugiWrap" style="display:none;">
+          <label>Ime radnika</label>
+          <input type="text" id="prodajaRadnikDrugi" placeholder="Ime">
+        </div>
+        <div class="field">
+          <label>Smena</label>
+          <select id="prodajaSmena">
+            <option value="1">1. smena</option>
+            <option value="2">2. smena</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label>Prodati artikal</label>
+          <input type="text" id="prodajaArtikal" list="itemsDatalist" placeholder="Upišite naziv ili šifru...">
+          <div class="hint" id="prodajaHint"></div>
+        </div>
+        <div class="field">
+          <label>Količina</label>
+          <input type="number" id="prodajaKolicina" min="1" step="1" value="1">
+        </div>
+        <div class="field">
+          <label>Cena</label>
+          <input type="number" id="prodajaCena" step="0.01" placeholder="0.00">
+        </div>
+        <button class="btn btn-primary" data-action="addProdaja">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Dodaj prodaju
+        </button>
+      </div>
+
+      <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--primary-dark);margin:4px 0 8px;">Evidentirane prodaje</div>
+      <div class="table-wrap" style="margin-bottom:26px;">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width:100px;">Datum</th><th style="width:90px;">Radnik</th><th style="width:80px;">Smena</th>
+              <th style="width:80px;">Šifra</th><th>Naziv artikla</th>
+              <th class="num" style="width:80px;">Kol.</th><th class="num" style="width:110px;">Cena</th>
+              <th class="num" style="width:120px;">Iznos</th><th class="no-print" style="width:60px;"></th>
+            </tr></thead>
+            <tbody id="prodajaBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--primary-dark);margin:4px 0 8px;">Pregled po danima</div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width:100px;">Datum</th>
+              <th>Radnik — 1. smena</th><th class="num" style="width:120px;">Pazar 1. smena</th>
+              <th>Radnik — 2. smena</th><th class="num" style="width:120px;">Pazar 2. smena</th>
+              <th class="num" style="width:110px;">Ukupno</th>
+              <th class="num" style="width:130px;">Stvarno u kasi</th>
+              <th class="num" style="width:140px;">Višak / manjak</th>
+            </tr></thead>
+            <tbody id="prometSummaryBody"></tbody>
+            <tfoot><tr>
+              <td colspan="2" style="text-align:right;">UKUPNO za period</td>
+              <td class="num" id="sumTotal1">0,00</td>
+              <td></td>
+              <td class="num" id="sumTotal2">0,00</td>
+              <td class="num" id="sumTotalUk">0,00</td>
+              <td class="num" id="sumTotalStv">0,00</td>
+              <td class="num" id="sumTotalVisak">0,00</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- UNIVERZALNA -->
+    <section class="view" id="view-univerzalna">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Univerzalna tabela</h1>
+          <p class="view-desc">Slobodna tabela za bilo koju evidenciju pripremljenu za štampu</p>
+        </div>
+        <div class="view-actions no-print">
+          <button class="btn" data-action="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="6" y="13" width="12" height="8"/><path d="M6 17H4a1 1 0 01-1-1v-4a1 1 0 011-1h16a1 1 0 011 1v4a1 1 0 01-1 1h-2"/></svg>
+            Štampaj
+          </button>
+        </div>
+      </div>
+
+      <div class="print-only"><div class="p-shop">Magic In — Univerzalna tabela</div><div class="p-meta" id="printMetaUni"></div></div>
+
+      <div class="form-row no-print">
+        <div class="field">
+          <label>Datum</label>
+          <input type="date" id="uniDatum">
+        </div>
+        <div class="field grow">
+          <label>Artikal (opciono — upišite naziv ili šifru)</label>
+          <input type="text" id="uniArtikal" list="itemsDatalist" placeholder="Ostavite prazno za slobodan unos">
+        </div>
+        <div class="field">
+          <label>Količina</label>
+          <input type="number" id="uniKolicina" step="1" placeholder="1">
+        </div>
+        <div class="field">
+          <label>Cena / iznos</label>
+          <input type="number" id="uniCena" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field grow">
+          <label>Napomena</label>
+          <input type="text" id="uniNapomena" placeholder="slobodan tekst">
+        </div>
+        <button class="btn btn-primary" data-action="addUniverzalna">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Dodaj red
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width:100px;">Datum</th><th style="width:90px;">Šifra</th><th>Naziv / opis</th>
+              <th class="num" style="width:90px;">Količina</th><th class="num" style="width:110px;">Cena</th>
+              <th class="num" style="width:120px;">Iznos</th><th>Napomena</th>
+              <th class="no-print" style="width:60px;"></th>
+            </tr></thead>
+            <tbody id="uniBody"></tbody>
+            <tfoot><tr><td colspan="5" style="text-align:right;">UKUPNO</td><td class="num" id="uniTotal">0,00 din.</td><td></td><td class="no-print"></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<datalist id="itemsDatalist"></datalist>
+
+<script>
+/* ================= DATA ================= */
+const ITEMS_SEED = [[1,'RUZA AKITO',132],[2,'RUZA RED BORLIN',200],[3,'RUZA TEMTEJSEN',540],[4,'RUZA EMERALDA',90],[5,'RUZA AMBASADOR',100],[6,'RUZA VENDELA',110],[7,'RUZA VIVALDI',120],[8,'RUZA WOW',130],[9,'RUZA SPINX',140],[10,'RUZA VENDELA BLU',150],[11,'RUZA LEANDRA',150],[12,'RUZA GRAND GALA',170],[13,'RUZA PARIS',180],[14,'RUZA AQUA',200],[15,'RUZA AMSTERDAM',250],[16,'RUZA CARRERA',300],[17,'RUZA LENI',280],[18,'HRIZANTEMA',160],[19,'HRIZANTEMA KOLOR',150],[20,'OBICAN LJILJAN',350],[21,'ORJENTAL LJILJAN',580],[22,'ORJENTAL EKSTRA',390],[23,'KALE',350],[24,'RAJ. PTICA GERBER',600],[25,'GERBER',150],[26,'ANTURIJUM',1104],[27,'BAMBUS SPIRALIS',550],[28,'BAMBUS',250],[29,'KARANFIL',48],[30,'BUKET DUO',100],[31,'BUKET DUO MIX',150],[32,'BUKET MIX',180],[33,'BUKET GATRDEN',200],[34,'BUKET GARDEN LL',250],[35,'BUKET APEL',4500],[36,'BUKET BIRD',300],[37,'BUKET SANY',320],[38,'BUKET LJILJANA',350],[39,'BUKET RUZA',380],[40,'BUKET MANGO',420],[41,'BUKET TUTI FRUTI',450],[42,'BUKET KARIBA',490],[43,'BUKET KOPAGANA',520],[44,'BUKET IRIS',540],[45,'BUKET GRETA',570],[46,'BUKET FILADELFIJA',590],[47,'BUKET DIGIREIN',630],[48,'BUKET LJUBICICA',640],[49,'BUKET RIO RITA',660],[50,'BUKET BLU SONG',680],[51,'BUKET MAGNOLIJA',720],[52,'BUKET ORHIDEJA',740],[53,'BUKET LA-LA-LA',780],[54,'BUKET TVISTER',250],[55,'BUKET BANANA',810],[56,'BUKET IVA',830],[57,'BUKET 0845',550],[58,'BUKET 0850',850],[59,'BUKET 0865',860],[60,'BUKET 0870',2000],[61,'BUKET 0885',880],[62,'BUKET 0895',890],[63,'BUKET 0900',900],[64,'BUKET 0920',920],[65,'BUKET 0925',930],[66,'BUKET 0930',940],[67,'BUKET 0945',950],[68,'BUKET 0950',960],[69,'BUKET 0960',970],[70,'BUKET 0965',980],[71,'BUKET 0975',1000],[72,'BUKET 0980',1150],[73,'BUKET 0985',1200],[74,'BUKET MAGIC LL',1300],[75,'BUKET MAGIC',1400],[76,'PARFEM J.S.P.',1170],[77,'KREMA FERARI',1375],[78,'PARFEM LAGERFELD',2550],[79,'PARFEM PARADOX',1750],[80,'PARFEM JACOMO',2055],[81,'PARFEM KARTIJER',480],[82,'PARFEM BURBERRY',430],[83,'PARFEM TRICIJA',475],[84,'PARFEM OPIUM',420],[85,'PARFEM JUST MUSK',515],[86,'PARFEM TIME BOMB',705],[87,'LOS. IS. ROSSELINI',805],[88,'PARFEM NOW',255],[89,'PARFEM FURY',225],[90,'PARFEM SIRENA',230],[91,'PARFEM KINDLE',215],[92,'PARFEM REPUBLIKA',210],[93,'PARFEM AQUA VITA',205],[94,'PARFEM BALERINA',190],[95,'PARFEM LOV GARDEN',195],[96,'DEZODORANS DIAVOLO',265],[97,'DEZODORANS A.B.',430],[98,'KOMPLET V.VAN GOGH',590],[99,'KOMPLET NIVEA',1000],[100,'KOMP. ZA KUP.AROMA',150],[101,'KOMP. NEUTRO ROB.',940],[102,'KOMP. BLACK LABEL',390],[103,'NIVEA POSLE BRIJ.',410],[104,'EVONIMUS',555],[105,'INT. KR. ANTI AGE',235],[106,'ADIDAS AFTER SHAVE',375],[107,'DEZODORANS AXE',649],[108,'DEZODORANS ADIDAS',290],[109,'PARFEM C-THRU',250],[110,'DEZODORANS NIVEA',200],[111,'AFTER SEI MACSHO',457],[112,'NIVEA PENA ZA KOSU',225],[113,'PENA ZA KOSU STYL.',275],[114,'KOM.NIVEA DUSCH-OL',535],[115,'KOMPLET ШBU',705],[116,'PARFEM ШBU',680],[117,'PARF.EAU DE TOILET',775],[118,'PARF.NATURAL SPRAY',465],[119,'DEZODORANS B.U.',225],[120,'MLEKO ZA TELO B.U.',225],[121,'B.U.LOSION',335],[122,'NIVEA KUPKA',255],[123,'KUPKA NIVEA BATHC',280],[124,'ML. ZA TELO NIVEA',345],[125,'KOMP.NOIVEA VISAGE',650],[126,'KOMP.NIVEA SH.CON.',855],[127,'DEZ. NIVEA BALANCE',215],[128,'KUPKA NIVEA PFL.',165],[129,'NIVEA BODY LOTION',285],[130,'NIV. BODY Q10 PLUS',365],[131,'KOMPLET SPORTSTAR',275],[132,'KOMPLET CLIVEN',435],[133,'KUPKA CLIVEN',1020],[134,'KUPKA F.AZZ. BAGNO',625],[135,'KUPKA F.AZ. DOCCIA',535],[136,'KUPKA F.AZ. NATURA',125],[137,'DEZ. FELCE AZZURRA',185],[138,'PARFEM CUBA',775],[139,'ML. ZA TELO OLANA',225],[140,'KUPKA GENERA',1385],[141,'KREME',569],[142,'KREMA CLIVEN',205],[143,'DEZODORANS FA',145],[144,'DEZODORANS CUBA',240],[145,'KOMPLET STENA',570],[146,'DEZODORANS DOVE',195],[147,'DOVE ANTI PERSP.',215],[148,'BODI MILK DOVE',295],[149,'DOVE SHOWER CARE',225],[150,'DOVE CREAM OIL SH.',235],[151,'DOVE BODY LOTION',270],[152,'DOVE SHAMPOO',185],[153,'DOVE MOIST.M.SAM.',175],[154,'DEZ.NEUTRO ROBERTS',175],[155,'PENA ZA KOSU GENER',125],[156,'DEZ.DIAV.PER DONNA',280],[157,'N.ROBERT AFTER SH.',335],[158,'PENA ZA BR.GILETE1',295],[159,'PENA ZA BR.GILETE2',230],[160,'AFTER SHШFA  MAGIC',340],[161,'KOMPLET ШINTESA',765],[162,'KOMPLET ШSTR8',895],[163,'KOMPLET V.VAN GOGH',855],[164,'KOMPLET ШPAGAN',970],[165,'KOMPLET ШDAISY',595],[166,'KOMP. ШBET. BURTY',755],[167,'KUTIJA ZA RUZU',380],[168,'FONTANA',1950],[169,'IKEBANA S.CV.U KOR',550],[170,'IKEBANA VEST.CVECE',370],[171,'IKEB. VECA S.CVECE',980],[172,'IK.MANJA S.CV.DZAK',680],[173,'SUVO CVECE U KOK.',105],[174,'S.CV.U KOR.SA LAUF',860],[175,'IKEBANA SA SUNCOK.',1215],[176,'VEST.CVECE U CUPU',35],[177,'SUVI BUKET',460],[178,'BUKET SUV SA SUNC.',445],[179,'S.CV.U KERAM.KORPI',1250],[180,'S.BUKET NA STUBAMA',650],[181,'SUVI ARANZMAN L',690],[182,'SUVI ARANZMAN LL',470],[183,'SUVI ARANZMAN LLL',750],[184,'SAKS.SA RUZ. SUVIM',310],[185,'ZIMNICA U FLASAMA',310],[186,'PRASE KASICA',210],[187,'VAZNA SREBR. MANJA',425],[188,'VAZNA ZELENA',325],[189,'VAZNA MANJA ZELENA',670],[190,'VAZNA STAKLENA',980],[191,'KORPA',65],[192,'KORPA ZA PICE',220],[193,'MACKA KERAMICKA',310],[194,'MACKA OD DRVETA',500],[195,'POSLUZ. ZA KREVET',350],[196,'VAZNA VECA SREBRNA',245],[197,'VAZNA KREM',490],[198,'KUT. ZA KLJ.M.BELA',580],[199,'KUT. ZA KLJ. PLAVA',480],[200,'SOLJE I CAJNIK',145],[201,'BOKAL SA SOLJ.KIN.',425],[202,'VAZNA VECA STAKL.',1740],[203,'DRV. KUTIJE MANJE',265],[204,'RAM ZA SLIKE L',340],[205,'RAM ZA SLIKE LL',355],[206,'RAM ZA SLIKE LLL',450],[207,'RAM ZA SLIKE LV',185],[208,'SAKSIJE SA KANAPOM',496],[209,'VAZA ROZA',490],[210,'SAKSIJE KER.ZELENE',490],[211,'KER. SAKSIJA SIVA',590],[212,'KUTIJA DRVENA VECA',355],[213,'VAZA OD MANGA VECA',435],[214,'VAZA OD MAN.SAR.M.',685],[215,'CUP OD MANGA',210],[216,'PIKSLA OD DRVETA',320],[217,'SVESKE OD PAPIRUSA',230],[218,'KERAM. CUP MANJI',320],[219,'SAKS. KERAM. CETV.',650],[220,'VAZA PLAVA VECA',305],[221,'VAZA PLAVA MANJA',180],[222,'NOTESI VECI',105],[223,'IMENIK',80],[224,'NOTESI MANJI',80],[225,'KER.POS.U OBL.SRCA',270],[226,'SAKS.KER.CETV.LAK.',550],[227,'SAKSIJE BELE MANJE',700],[228,'SAKSIJE REBR.BELE',890],[229,'SAKS.BELE-PRUGE',130],[230,'POSLUZ. DRV-PODM.',860],[231,'KUTIJA SESTOUGAO',320],[232,'KUTIJA KOCKASTA',260],[233,'DRVENA ZABA',465],[234,'KUTIJA TROUGLASTA',280],[235,'SAT DRVENI',855],[236,'ALBUK KOFER',1100],[237,'ADRESAR-OLOVKA',410],[238,'ALBUM SA PLOИOM',640],[239,'CUP SA DRSKAMA',440],[240,'CUP VECI-SARE',410],[241,'CUP MANJI-CVECE',360],[242,'TANJIR SA STAKLOM',420],[243,'VAZNA SA TUFNAMA',310],[244,'VAZA STAKLENA M.U',345],[245,'VAZA ST.PRAVOUGAO',495],[246,'SAKSIJE SA SARGAR',380],[247,'SAKSIJE ZLATNE B.',360],[248,'SAKSIJE ZELENE M.',240],[249,'SAKSIJE U.PR.BELE',355],[250,'SAKSIJE ROZE VECE',3900],[251,'SAKSIJE ZLATNE PR',1890],[252,'SAKSIJA SIVA LEZ.',530],[253,'FLASICA STAKLENA',100],[254,'VAZNA OD MESINGA',540],[255,'VAZNA ST.M.PRAV.',265],[256,'VAZNA I POSTOLJE',210],[257,'TAM-TAM',985],[258,'MASKE',450],[259,'PTICE-BAMBUS-VR.',535],[260,'ИINIJA ZABA',380],[261,'KORPICA',10],[262,'KORPA',180],[263,'SVECE U GRANULAMA',70],[264,'SVECA U KUTIJI',95],[265,'SVECA-LALE',350],[266,'SVECA KOCKA',485],[267,'SVECA U KOFI',635],[268,'SVECA-ИASI SA RUZ',330],[269,'SVECA U ИASI',60],[270,'SVECA SA KANAPOM',395],[271,'SVECA ZELENA',40],[272,'SVECA U TEGLI',170],[273,'KOMP.SVECA-ИASA',150],[274,'KOMPLET SVECA',210],[275,'SVECE U ST.CVETU',120],[276,'M.MIRISLJ. SVECE',15],[277,'SVECNJAK K.GVOZDJE',380],[278,'SVECNJ.V.K.GVOZDJE',1500],[279,'SVECNJACI PLAVI',170],[280,'SVECNJ.-TRI ИASE',395],[281,'SVECNJAK-MOST',580],[282,'SVECNJAK-DVE ИASE',420],[283,'RIBA ST.ZA SVECE',185],[284,'MESEC ST.ZA SVECE',155],[285,'ИETVRT. SVECNJAK',185],[286,'CINIJE ZA SVECU 1',235],[287,'CINIJE ZA SVECU 2',250],[288,'SVECE KRIVE',145],[289,'SVECE KR.MANDAR.',50],[290,'SVECE POMORANDZE',110],[291,'LIMUN SVECE',110],[292,'SVECA GROZDJE',115],[293,'SVECA MAK',105],[294,'KORPA OD ROSVAJA',250],[295,'PICE BOLS',850],[296,'TEK. TWO FINGERS',1195],[297,'VINO SMEDEREVKA',176],[298,'MARTINI',1190],[299,'KINESKI  CUP',810],[300,'ZELENA VAZA-LIMUN',160],[301,'ROZE SVECE VECE',20],[302,'UVIJENE SVECE M.',30],[303,'UKR.SVECE UV.PL.',35],[304,'U.SVECE N.PL.1/10',130],[305,'UKR.SV.CANDLES1/4',650],[306,'KER.SAKSIJE OKR.V',610],[307,'V.PL.KER.SAKSIJE',790],[308,'LUFA',8160],[309,'LUFA ZELENA',75],[310,'CUP BRAON PLETENI',760],[311,'SUVO CVECE SV.BR.',45],[312,'SUVO CVECE T. BR.',40],[313,'SUV BAMBUSOV ORAH',410],[314,'S.BOBIИ.CVECE Z.B',60],[315,'S.CVECE-ИASICA',50],[316,'DRVENO SRCE',20],[317,'SUVE RUZE',45],[318,'KOMPL. SUVO CVECE',150],[319,'SUVA METLICA',70],[320,'SUVO CVECE-SESIR',770],[321,'SUVE SISARKE',35],[322,'SUVI SNOPИICI',30],[323,'SUVE PEИURKE',15],[324,'SUVI LISTICI BELI',20],[325,'SUVI LISTICI ZUTI',10],[326,'S. STAPICI BAMBUS',45],[327,'LJUBIИ.PALMA SUVA',80],[328,'PROTEA SUVA',160],[329,'SUVI PLAVI CVETICI',25],[330,'UKRASNA LAM.',985],[331,'SPAT.SOPHEN',840],[332,'VRESIJAH',760],[333,'DRAC. HED',3800],[334,'SAFLERAH',860],[335,'ПЛ.CAKC. 015',15],[336,'ЋУП 1100H',1100],[337,'BAЗHA 0525',580],[338,'PУЖA 0160',130],[339,'PУЖA 0150',220],[340,'S.CVETI CI-BOB.C.',55],[341,'SUVI SUNCOKRET',65],[342,'S.PLETENO DRVECE',35],[343,'S. VRCKAVO CVECE',420],[344,'KESE ZA PICE VECE',125],[345,'KESE ZA POKLONE',60],[346,'KOVERTE',20],[347,'PORUKE',10],[348,'TRAVA SEME',650],[349,'PL.ZARDINJERE 40',105],[350,'PL.ZARDINJERE 32',85],[351,'PL.ZARDINJERE 20',140],[352,'PL.SAKSIJE KOC.26',85],[353,'PL.SAKSIJE KOC.23',65],[354,'PL.SAKSIJE OKR.17',70],[355,'PL.SAKSIJE OKR.21',85],[356,'PL.SAKSIJE OKR.24',80],[357,'PL.SAKSIJE OKR.25',185],[358,'PL.SAKSIJE OKR.30',130],[359,'PL.SAKSIJE OKR.15',34],[360,'PL.SAKSIJE OKR.14',230],[361,'PL.SAKSIJE OKR.13',45],[362,'PL.SAKSIJE OKR.18',28],[363,'PL.SAKS.OKR.22,7L',390],[364,'PL.SAKSIJE OKR.25',390],[365,'PL.SAKSIJE OKR.39',185],[366,'PRIHR. CVECE 0125',220],[367,'PRIHR. CVECE 0110',280],[368,'PRIHR. CVECE 0140',580],[369,'PRIHR. CVECE 0190',380],[370,'KORPA PLETENA0290',290],[371,'KORPA PLETENA0310',310],[372,'KORPA PLETENA0520',520],[373,'KORPA PLETENA0275',275],[374,'KORPA PLETENA0485',1200],[375,'KORPE PLET. 050',500],[376,'KORPE PLET. 070',450],[377,'KORPE PLET. 090',700],[378,'KORPE PLET. 0120',580],[379,'KORPE PLET. 0155',900],[380,'KORPE PLET. 0185',1200],[381,'KORPE PLET. 0230',230],[382,'STAPOVI-BAMBUS100',235],[383,'STAPOVI-BAMBUS060',90],[384,'STAPOVI-BAMBUS180',460],[385,'STAPOVI-BAMBUS260',290],[386,'KORPA 0200',200],[387,'KORPA 0220',280],[388,'KORPA 0170',170],[389,'KORPA 0250',250],[390,'KORPA 0320',300],[391,'KORPA 0235',340],[392,'KORPA 0450',320],[393,'KORPA 0775',450],[394,'GRABULJA 0540',540],[395,'TORBA 0155',300],[396,'ASURA 0650',650],[397,'KORPA 0270',270],[398,'KORPA 0240',240],[399,'KORPA 0180',180],[400,'LUKOVICE LALE0380',20],[401,'LUKOV.NARCIS 0320',100],[402,'LUKOVICE KROK0290',95],[403,'LUKOVICE 0280',350],[404,'LUKOVICE 0240',165],[405,'LUKOVICE 0250',255],[406,'LUKOVICE 0180',195],[407,'LUKOVICE 0210',190],[408,'LUKOVICE 0190',270],[409,'LUKOVICE 0400',255],[410,'LUKOVICE 0150',170],[411,'LUKOVICE 0360',450],[412,'LUKOVICE 0140',200],[413,'LUKOVICE 0690',130],[414,'LUKOVICE-KUT.0930',150],[415,'SEME VECE 055',35],[416,'SEME MANJE 035',70],[417,'ZEMLJA 0,5L 035',85],[418,'ZEMLJA 10L 060',160],[419,'ZEMLJA 25L 0160',350],[420,'ZEMLJA 50L 0310',580],[421,'ARALIJA 0790',890],[422,'KORPA 0430',440],[423,'KORPA 0360',360],[424,'DIZGOTEJA 0280',840],[425,'JUKA 0510',1250],[426,'KROTEN 0340',880],[427,'KROTEN 0390',590],[428,'DRACENA 0815',390],[429,'KAKTUS 0360',620],[430,'PALMA 0230',590],[431,'FIKUS 0190',4200],[432,'BENDZAMIN 0465',540],[433,'BENDZAMIN 0495',495],[434,'FIKUS 0320',680],[435,'KALATEA 0440',1280],[436,'KALATEA 0490',980],[437,'SPATIFILUM 0750',840],[438,'KROTON 0350',980],[439,'PALMA 0180',1800],[440,'SAFLERA 0450',4200],[441,'BENDZAMIN 0590',9899],[442,'DRACENA 0240',590],[443,'KROTON 0760',1100],[444,'GUZMALIJA 0980',1380],[445,'FILADENDRON 0780',1260],[446,'LOZA 0840',1880],[447,'CIKAS PALMA 0720',2200],[448,'KORDILINA 0470',620],[449,'GARDENIJA 0690',960],[450,'NOLINA 0530',700],[451,'ALOKASIJA 0420',790],[452,'SAFLERA 0430',480],[453,'CIKAS PALMA 1620',1500],[454,'DIFENBAHIJA 0480',864],[455,'STROMANTA 0385',3100],[456,'SINGONIJUM 0250',690],[457,'ASPLENIJUM 0220',620],[458,'KESTEN 0570',1560],[459,'DIFENBAHIJA 0270',1890],[460,'VISINGTONIJA 1900',1900],[461,'DRACENA 0160',640],[462,'BENDZAMIN 0810',850],[463,'KALATEA 0310',790],[464,'LJUBIИICA 0170',380],[465,'DIFENBAHIJA 0275',620],[466,'HRISTOS VENAC0545',420],[467,'DRACENA 2100',1450],[468,'DRACENA 2160',4600],[469,'JELKA 0990',2400],[470,'SINGONIUM 1070',1250],[471,'KAKTUS 0620',480],[472,'DRACENA 1430',1750],[473,'PALMA 0580',1310],[474,'STROMANTA 1100',2280],[475,'PALMA 1970',4350],[476,'KALATEA 0680',980],[477,'SAFLERA 0520',690],[478,'FIKUS 0630',660],[479,'KALATEA 0460',320],[480,'DRACENA 0860',720],[481,'JUKA 0880',1350],[482,'KAKTUS 1950',940],[483,'LIOLING 2680',6600],[484,'PALMA 0790',790],[485,'JUKA 3630',3900],[486,'NOLINA 8950',1820],[487,'KELICIJA 2950',15200],[488,'ARALIJA 4700',980],[489,'ZAMIJA 4780',1980],[490,'VASINGTONIJA 3250',6900],[491,'DRACENA 4760',380],[492,'SUVO CVECE 1',180],[493,'SUVO CVECE 2',150],[494,'UKRAS A',180],[495,'UKRAS B',50],[496,'GUZMANIJA A.',1240],[497,'DIFENBAHIJA T.',890],[498,'ZUMBUL',150],[499,'CAMELIJA J.',980],[500,'STROMANTA 1360',2170],[501,'CIKAS PALMA 4700',6800],[502,'BENDZAMIN 1200',2980],[503,'HIBISKUS 0290',680],[504,'SOLANUM 0410',440],[505,'GLOKASINIJA 0260',250],[506,'JUKA 1260',4800],[507,'RUZA 0210',300],[508,'BAMBUS 0635',1760],[509,'KESE ZA POKLON050',145],[510,'KLIVIJA 0950',1970],[511,'KAKTUS 0120',480],[512,'KALANHOA 0200',380],[513,'MARGARETE 0150',240],[514,'MARGARETE 0890',480],[515,'DRVENA SAKS.0720',720],[516,'PAPIRI 005',50],[517,'PAPIRI 010',10],[518,'UKR.PAPIR 015',30],[519,'UKR.PAPIR 035',40],[520,'UKR.PAPIR 045',50],[521,'UKR.PAPIR 050',100],[522,'MREZICA 060',100],[523,'MREZICA 025',120],[524,'UKR.TRAKA 090',20],[525,'UKR.TRAKA 010',30],[526,'UKR.TRAKA 025',40],[527,'UKR.TRAKA 015',50],[528,'UKR.TRAKA 020',70],[529,'UKR.TRAKA 030',100],[530,'UKR.TRAKA 035',35],[531,'UKR.TRAKA 075',75],[532,'UKR.PAPIR 030',195],[533,'KREP PAPIR 040',40],[534,'MASNA 005',10],[535,'MASNA 010',20],[536,'MASNA 015',30],[537,'MASNA 020',40],[538,'MASNA 030',50],[539,'MASNA 035',60],[540,'MASNA 040',70],[541,'MASNA 050',80],[542,'MASNA 060',90],[543,'MASNA 070',200],[544,'MASNA 080',80],[545,'MASNA 085',85],[546,'MASNA 090',90],[547,'MASNA 100',100],[548,'KORA OD BANANE040',40],[549,'SUVO CVECE MAH080',560],[550,'KESE ZA CVECE 020',300],[551,'PL. SAKSIJA 40',6900],[552,'OPJEHTAЛ A350',60],[553,'ИЛEKC .450',780],[554,'PAM 0610',610],[555,'PAM 0090',90],[556,'PAM 0075',50],[557,'SVECA 0025',30],[558,'SVECA 0035',40],[559,'SVECA 0080',50],[560,'SVECA 0065',2],[561,'SVECA 0045',5],[562,'BUKET 0110',110],[563,'BUKET 0120',120],[564,'BUKET 0130',130],[565,'BUKET 0140',140],[566,'BUKET 0160',160],[567,'BUKET 0170',170],[568,'BUKET 0190',190],[569,'BUKET 0210',210],[570,'BUKET 0220',220],[571,'BUKET 0230',230],[572,'BUKET 0240',240],[573,'BUKET 0260',260],[574,'BUKET 0270',270],[575,'BUKET 0290',290],[576,'BUKET 0310',310],[577,'BUKET 0330',330],[578,'BUKET 0340',340],[579,'BUKET 0360',360],[580,'BUKET 0370',580],[581,'BUKET 0390',390],[582,'BUKET 0400',400],[583,'BUKET 0410',280],[584,'BUKET 0430',430],[585,'BUKET 0440',440],[586,'BUKET 0460',460],[587,'BUKET 0470',470],[588,'BUKET 0480',480],[589,'BUKET 0500',500],[590,'BUKET 0510',510],[591,'BUKET 0530',530],[592,'BUKET 0550',550],[593,'BUKET 0560',560],[594,'BUKET0580',580],[595,'BUKET 0600',600],[596,'BUKET 0610',610],[597,'BUKET 0620',620],[598,'BUKET 0670',670],[599,'BUKET 0690',690],[600,'BUKET 0700',700],[601,'BUKET 0710',710],[603,'BUKET 0750',750],[604,'BUKET 0760',760],[605,'BUKET 0770',770],[606,'BUKET 0800',800],[607,'BUKET 0820',820],[608,'BUKET 0910',910],[609,'BUKET 1100',1500],[610,'BUKET 1200',1630],[612,'BUKET 1400',2270],[613,'BUKET 1500',650],[614,'LUKOVICE 0160',35],[615,'LUKOVICE 0220',35],[616,'LUKOVICE 0120',35],[617,'YUCCA 0660',2550],[618,'OPUNIKA',1560],[619,'P.ZA CVECE 0190',235],[620,'P.ZA CVECE 0290',360],[621,'OGLEDALO 0210',210],[622,'TRAVA SEME 0180',230],[623,'UKRAS 0360',200],[624,'UKRAS 0745',300],[625,'ORHIDEJA 0180',1200],[626,'SAMPON 060',60],[628,'KUOKA 0310',310],[629,'DEO 0280',280],[630,'DEO 0105',105],[631,'DEO 0140',140],[632,'DEO 0170',170],[633,'DEO 0245',300],[634,'DEO 195',195],[635,'GEL 0270',270],[636,'STIK 070',75],[637,'STIK 0210',210],[638,'STIK 0235',235],[639,'PARFEM 0690',1480],[640,'PARFEM 0790',790],[641,'DEO 0255',255],[642,'KER.SAK. 0390',650],[643,'KER.SAKS. 0S40',350],[644,'KER.SAKS. 0265',490],[645,'P.ZA CVECE',195],[646,'RUZA SADNICA',180],[647,'SUNDJER',150],[648,'U.KORPA 0130',130],[649,'U.KORPA 0150',150],[650,'U.KORPA 0210',210],[651,'M.RUZA',420],[652,'CALCELARIJA',100],[654,'P.SAKSIJA 45',850],[655,'P.SAKSIJA 100',9550],[656,'P.SAKSIJA',580],[657,'P.SAKSIIA40',285],[658,'P.SAKSIJA 55',55],[659,'P.SAKSIJA 014',19],[660,'P.SAKSIJA 040',40],[661,'P.SAKSIJA 090',150],[662,'TRAVNA SMESA',220],[663,'P.SAKSIJA 0270',560],[664,'P.SAKSIJA 0170',750],[665,'P.SAKSIJA 0120',130],[666,'LUKOVICE 0010',12],[667,'LUKOVICE 0045',35],[668,'LUKOVICE 0050',60],[669,'LUKOVICE 0055',28],[670,'LUKOVICE 0060',60],[671,'LUKOVICE 0080',160],[672,'LUKOVICE 0090',60],[673,'LUKOVICE 0100',250],[674,'LUKOVICE 0120',18],[675,'CLEMATIS',560],[676,'PARTE.VEITCHI',960],[677,'PIERIS',1170],[678,'ERICA',250],[679,'CV.ARANZMAN 1',2500],[680,'CV.ARANZMAN 2',900],[681,'CV.ARANZMAN 3',580],[682,'CV.ARANZMAN 4',500],[685,'PARFEM 02',30],[686,'YUCCA 0660',1180],[687,'RODODENDRON',2300],[688,'VEST.BILJKA 01',100],[689,'VEST.BILJKA 02',250],[690,'VEST.BILJKA 03',200],[691,'VESS.BILJKA 04',50],[692,'SUVI ARANZMAN',2510],[693,'CACTUS 01',530],[694,'CACTUS 02',250],[695,'DRZAC ZAR.',100],[696,'BROMELA',680],[697,'CACTUS',480],[698,'ANTURIJUM',1560],[699,'ANTURIJUM A',890],[700,'DIFENBAHIJA',1890],[701,'NEFROLEPSIS',750],[702,'BONSAI',3380],[703,'UKRAS.O.',750],[704,'UKRAS.A.',890],[705,'UKRAS.I.',1190],[706,'UKRAS.V.',890],[707,'TORBA',400],[708,'SINGONIJUM',2540],[709,'UKRAS A',400],[710,'UKRAS B',550],[711,'UKRAS C',220],[712,'SAKSIJA K.',390],[713,'SAKSIJA V.',7900],[714,'SAKSIJA A.',1800],[715,'SAPHLERA',650],[716,'FONTANA 1',4600],[717,'FONTANA 2',2150],[718,'CICAS',3800],[719,'SHAMAROPS',9400],[720,'LACKY B.',1370],[721,'AEHMEJA',1960],[722,'ASPARAGUS',360],[723,'FICUS BELISE',760],[724,'FICUS ROBUST',3600],[725,'KORDILINA K.',890],[726,'PAHIRA A.',1490],[727,'TSILANDIJA',980],[728,'KROTON EX.',1560],[729,'CHAMADOREA',590],[730,'CALLATEA',1980],[731,'ARRECA',380],[732,'BENDJAMIN S.',3650],[733,'PAHIRA O.',12000],[734,'BANANA MUSA',490],[735,'LOZICA',450],[736,'LOZICA A.',120],[737,'SUKULENTA',100],[738,'CACTUS',1190],[739,'ACUBA J.',1250],[740,'CALLATEA M.',350],[741,'MARANTA',680],[742,'BROMELLA',980],[743,'DRACENA',1260],[744,'CHAMADOREA',390],[745,'DRACENA I.',1800],[746,'DISCOTEA',580],[747,'SPATIPHILUM S.',790],[748,'SPATIPHILUM M.',980],[749,'SPATIPHILUM P.',680],[750,'SPATIPHILUM W.',560],[751,'SINGONIJUM',660],[752,'BENDZAMIN O.',7900],[753,'BENDZAMIN A.',960],[754,'BENDZAMIN R.',980],[755,'BENDZAMIN B.',420],[756,'CROTON',490],[757,'GARDENIJA',690],[758,'FICUS R.',1850],[759,'CAPHLERA SJ',1840],[760,'ARECA',420],[761,'ANTURIJUM S.',1480],[762,'DISCOTEA',590],[763,'PUMILA',890],[764,'HEDERA',250],[765,'MARANTA S.',1880],[766,'PAHIRA AQUATICA',1950],[767,'DRACENA',770],[768,'NOLINA',700],[769,'KORDILINA',720],[770,'DRACENA M.',3700],[771,'ZAMIJA',1100],[772,'FICUS',1050],[773,'ALOKASIJA',1160],[774,'DIFENBAHIJA',680],[775,'AFELANDRA',890],[776,'EUFORBIJA',1150],[777,'HRIZANTEMA A',390],[778,'VAZNA',1450],[779,'VAZNA S.',280],[780,'SOLJE',50],[781,'SUVO CVECE',400],[782,'DRZAC B.',860],[783,'DRZAC Z.',80],[784,'UKRAS A',55],[785,'UKRAS S.',390],[786,'UKRAS*',120],[787,'UKRAS Z.',250],[788,'UKRAS SR',590],[789,'UKRAS C.',280],[790,'EUFORBIJA M.',450],[791,'HRIZANTEMA',200],[792,'ANTURIJUM R.',2580],[793,'NEORGELIJA',560],[794,'SALAGINELA',300],[795,'AZALEJA',760],[798,'PRIHRANA 0,2',280],[799,'PRIHRANA 0,5',390],[800,'PRIHRANA H.',470],[801,'KALATEA R.',1860],[802,'MARANTA',1450],[803,'UKR.SVECA',45],[804,'UKR.SLOVA',60],[805,'BALONI',8],[806,'STAPICI M.',320],[807,'STAPICI V.',85],[808,'DEKORACIJA',470],[809,'DEKORACIJA M.',45],[810,'U.SVECA',70],[811,'SUVA DEKORACIJA',520],[812,'SUVO CVECE',25],[813,'LJUBICICA',540],[814,'NOLINA',650],[815,'PEPEROMIJA',690],[816,'MUSEMA-U.FOLIJA',280],[817,'CREVO 25 M',2080],[818,'PRIK. ZA CREVO 1',185],[819,'PRIK. ZA CREVO 2',395],[820,'KOLUT ZA NAMOT.',2040],[821,'PARFEM P.',1090],[822,'GERBER M.',245],[823,'CALANHOJA M.',600],[824,'ANANAS',1930],[825,'COLUMNEA',1980],[826,'STRELIZZIA',2400],[827,'JASMIN',980],[828,'CRASULA',680],[829,'ZEMLJA B. 5/1',2400],[830,'ZEMLJA C. 10/1',90],[831,'ORHIDEJA BOX.',280],[832,'RAM ZA SLIKE',140],[833,'ERIKA',250],[834,'CH. FLECHERI',350],[835,'KASICA',450],[836,'KASICA S.',250],[837,'KASICA M.',230],[838,'UKRAS V.',1700],[839,'CH.FLECHERI',300],[840,'SALIX',1250],[841,'SALIX A.',1200],[842,'SALIX V.',1980],[843,'BUGUNVILEA',1850],[844,'MUSKATLA',150],[845,'ZEMLJA 1/80',13200],[846,'VES.DJUBR.',280],[847,'P.POSUDA',120],[848,'LACKY B.',980],[849,'ACHIANTUS',1200],[850,'CLEMATIS 1',780],[851,'CLEMATIS 2',800],[852,'RUZA STABLASICA',165],[853,'LONICERA',890],[854,'ACER',2000],[855,'CAMPSIS',1210],[856,'EONIMUS',980],[857,'LAVANDULA',450],[858,'LACKY BAMBU',1950],[859,'KANTA PO.',180],[860,'LANAC Z SAKS.',110],[861,'V.DJUBRIVO',2180],[862,'CLINIK P.',840],[863,'USLUGA R.',4800],[864,'LJUBICICA',480],[865,'BEGONIA SEMP.',150],[866,'HEBA',860],[867,'FITONIA',150],[868,'BEGONIA SEMPERF.',120],[869,'GAZANIA',300],[870,'DAHLIA',50],[871,'RUZMARIN',180],[872,'HIDROGENEA',680],[873,'WISTERIA',1980],[874,'TAGETES S.',20],[875,'SALVIA',350],[876,'PERENE',250],[877,'ACER',2376],[878,'CAREOPSIS',270],[879,'MAC',270],[880,'DIANTUS M.',150],[881,'PERENE V.',200],[882,'PETUNIJA O.',120],[883,'HOSTA',200],[884,'PL.TRAVA',150],[885,'SORBUS',670],[886,'CELOSIJA',80],[887,'CINIJA H.',60],[888,'ALISUM',120],[889,'EVONIMUS',1680],[890,'RODODENDRON',890],[891,'BOSIOK-',25],[892,'FUKSIA',250],[893,'PET.SURFINIA',120],[894,'TORBA A.',380],[895,'TORBA V.',750],[896,'ASTILBA',250],[897,'CODECIUM EX',760],[898,'LEPEZA',845],[899,'STENATA',1680],[900,'NEFROLEPSIS',2980],[901,'LOTOS-N.',930],[902,'DEPLANDIA',650],[903,'DRACENA C.',1250],[904,'THUJA REJNG.',650],[905,'THUJA HOLSTR.',250],[906,'BERBERIS',150],[907,'JUNIPERUS HORIZONT',486],[908,'JUNIPERUS BLU STAR',450],[909,'SJAJ ZA LIST',220],[910,'ORINTOGALUM',75],[911,'D.UKRAS',90],[912,'RAM ZA SL.',490],[913,'UKRAS',390],[914,'KAKTUS 1',620],[915,'KAKTUS',2550],[916,'LAMPA',2585],[917,'BUXUS',495],[918,'BUUUS S.',2376],[919,'SCIPIRUS',300],[920,'TRAKA 1M.A',10],[921,'TRAKA 1M.B',20],[922,'TRAKA 1M.C',30],[923,'TRAKA 1M.D',35],[924,'TRAKA 1M.E',80],[925,'TRAKA 1M.F',45],[926,'TRAKA 1M.G',50],[927,'HIPOESTES',1320],[928,'HRIZANTEMA**',150],[929,'IRIS',70],[930,'KRASPEDIA',40],[931,'ORINTOGALUM',250],[932,'ALSTROMELIA',150],[933,'PEPEROMIA',720],[934,'KESE',1.85],[935,'BRASICA',1560],[936,'SCIPIRUS',1890],[937,'ALOKASIJA',670],[938,'CIKLAMA S',450],[939,'ZVONO',365],[941,'VAZNA S.',980],[942,'VAZNA A.',1260],[943,'VAZNA B.',680],[944,'VAZNA C.',980],[945,'L.BAMBUS',450],[946,'KEKCIJA',12600],[947,'UKRAS',55],[948,'VAZNA',490],[949,'UKRAS 1',410],[950,'UKRAS 2',860],[951,'UKRAS 3',400],[952,'UKRAS 4',300],[953,'UKRAS 5',300],[954,'UKRAS 6',200],[955,'UKRAS 7',650],[956,'UKRAS 8',800],[957,'UKRAS 9',450],[958,'UKRAS 10',280],[959,'S.CVECE 1',120],[960,'S.CVECE 2',265],[961,'S.CVECE 3',195],[962,'UKRAS 11',360],[963,'UKRAS 12',155],[964,'UKRAS 13',160],[965,'S.CVECE 4',180],[966,'LACKY BAMBUS',1290],[967,'BONSAI',3200],[968,'BANBUS SPIRALIS',1730],[969,'BAMBUS S.',250],[970,'ORHIDEJA R.',750],[971,'DIZGOTEKA',3400],[972,'NARCISUS',120],[973,'MUSKARI',120],[974,'TRAVA 7.5',600],[975,'TRAVA 1',280],[976,'VINOVA LOZA',390],[977,'T.STRICTA',594],[978,'MALC',750],[979,'TAXUS',2800],[980,'PIERES',1250],[981,'HEESTERS',740],[982,'T.SMARAGD',864],[983,'FITO-INSEKC.',125],[984,'SJAJ ZA LIST',650],[985,'SINDAPSUS',900],[986,'U.KESA',35],[987,'VAZNA 1',1140],[988,'VAZNA 2',1750],[989,'VAZNA 3',2200],[990,'PUMPA F',8840],[991,'VIOLA',20],[992,'UKRAS',50],[993,'POZIVNICE',170],[994,'SANSEVERIJA',410],[995,'ORHIDEJA',2250],[996,'ORHIDEJA*',3650],[998,'GARDENIJA',530],[999,'ZEMLJA 1',890],[1000,'ZEMLJA 2',2480],[1001,'ZEMLJA 3',210],[1002,'CROCUS',80],[1003,'NARCIS',120],[1004,'PRIMULA',100],[1005,'RODODENDRON',1830],[1006,'RODODENDRON*',1760],[1007,'MITROS',440],[1008,'IMPATIJANS V.',120],[1009,'BACOPA',44],[1010,'LOBULARIJA',20],[1011,'CITRUS',4800],[1012,'ZEMLJA 5L',360],[1013,'ZEMLJA 4',450],[1014,'ZEMLJA 5L',580],[1015,'ZEMLJA 6',320],[1016,'ZEMLJA 7',1050],[1017,'OGLEDALO 1',820],[1018,'OGLEDALO 2',2480],[1019,'OGLEDALO 3',3140],[1020,'OGLEDALO 4',2790],[1021,'ACER',2480],[1022,'SKIMIA',280],[1023,'SINDAPSUS',1590],[1024,'PIERES',480],[1025,'BONSAI',1980],[1026,'LIVINGSTONA',1700],[1027,'AGAVA',380],[1028,'JUNKUS-',560],[1029,'LUDISIA',300],[1030,'SENECIO',150],[1031,'SUCULENTA1',890],[1032,'SUCULENTA',980],[1035,'DIFENBAHIJA COMP.',750],[1036,'DIFENBAHIJA',1170],[1037,'ZEMLJA 8',400],[1038,'ZEMLJA 9',420],[1039,'ABOTULION',220],[1040,'TAXUS',135],[1041,'HIDRANGEA',1170],[1042,'BUGUNVILEA',1980],[1043,'UBRUS',300],[1044,'T.PAPIR',57],[1045,'T.SAPUN',520],[1046,'K.SMECE',102],[1047,'CASA 1',40],[1048,'CASA 2',38],[1049,'WC CETKA',105],[1050,'KESA SMECE',101.57],[1051,'KASICICA ES.',280],[1052,'ZICA RO.',39],[1053,'BRISKO MOP',90],[1054,'PVC CASA',150],[1055,'KESA SMECE*',110],[1056,'ZAKACKA',20],[1057,'TELESKOP.DRSKA',55],[1058,'SALVETE 1',40],[1059,'SALVETA 2',72],[1060,'NOZ 1',1360],[1061,'SALVETE 3',33.5],[1062,'CASE 3',200],[1063,'UBRUS 1',100],[1064,'UBRUS 2',200],[1065,'ZOGER',270],[1066,'BURE PVC',75],[1067,'RUKAVICE',105],[1068,'UBRUS',260],[1069,'WC PREKRIVAC',980],[1070,'DRZAC PRE.',3],[1071,'KESE TREGE.',2.4],[1072,'METLA',250],[1073,'TRULEKS KRPA',105],[1075,'OFINGER',18],[1076,'AL.FOLIJA',720],[1077,'STREC FOLIJA',84],[1079,'KANTA',120],[1080,'PIKSLA',60],[1081,'OVAL',498],[1082,'CACKALICA',60],[1083,'PLIN.BOCA',95],[1084,'FOLIJA',420],[1085,'AQUAMAT',280],[1086,'F.KUTIJA',880],[1087,'KASICICE 1',250],[1088,'KASICICE 2',140],[1089,'KRPA 1',100],[1090,'M.KRPA',150],[1091,'AL.FOLIJA',649],[1092,'S.METLA',245],[1093,'KORPA',250],[1094,'CALISIA',560],[1095,'EUSTOMA',560],[1096,'CALADIUM',600],[1097,'MYRTUS',66],[1098,'TRADESKANTIA',250],[1099,'ARDISIA',1500],[1100,'FITONIA',120],[1101,'NERTERA',520],[1102,'MUHLENBLAHIA',720],[1103,'STEPHANOTIS',1980],[1104,'EVONIMUS',1680],[1105,'SLIKA 1',1230],[1106,'SLIKA 2',2030],[1107,'SLIKA 3',2970],[1108,'VINO A',485],[1109,'VINO B',580],[1110,'VINO C',770],[1111,'VINO D',360],[1112,'ACACIA',2860],[1113,'CORNUS',860],[1114,'CYTISUS',760],[1115,'PASIFLORA',1180],[1116,'WEIGELIA',350],[1117,'HAMMAMELIS',2100],[1118,'VIBURNUM',1600],[1119,'CYTISUS ST.',2550],[1120,'SIBLJE',500],[1122,'BUDLEA',960],[1123,'LJUSTAC',215],[1124,'UPALJAC',210],[1125,'NOZ',125],[1126,'OTVARAC',625],[1127,'VILJUSKA',30],[1128,'NOZ',135],[1129,'KASIKA',65],[1130,'LONCE',980],[1131,'CASA 4',95],[1132,'CACKALICA',65],[1133,'TANJIRI',108],[1134,'CASA 5',99],[1135,'CASA 6',48],[1136,'CASA 7',115],[1137,'CASA 8',190],[1138,'CASA 9',48],[1139,'CASA 10',120],[1140,'CASA 11',90],[1141,'CASA 12',95],[1142,'CASA 13',25],[1143,'CASA 14',110],[1144,'CASA 15',45],[1145,'DRZAC',8],[1146,'OSVEZIVAC',965],[1147,'HRIZANTEMA*',150],[1148,'OGRADA 1',230],[1149,'OGRADA 2',360],[1150,'OGRADA 3',660],[1151,'OGRADA 4',970],[1152,'PELINKOVAC',460],[1153,'MALC 1',900],[1154,'MALC 2',80],[1155,'MALC 3',650],[1156,'MALC 4',380],[1157,'MALC 5',450],[1158,'MALC 6',650],[1160,'PLATANUS',2376],[1161,'FRAXINUS',1670],[1162,'FRAXINUS.P.',2600],[6602,'BUKET 0730',730]];
+
+let ITEMS = [];          // [{sifra,naziv,cena}]
+let ITEMS_BY_SIFRA = {}; // sifra -> item
+let LAGER = [];          // [{sifra,kolicina}]
+let OTPISI = [];         // [{id,datum,sifra,kolicina,razlog}]
+let PRODAJA = [];        // [{id,datum,radnik,smena,sifra,naziv,cena,kolicina,iznos}]
+let ZAKLJUCCI = [];      // [{datum,stvarno}] - stvarno prebrojan novac po danu
+let UNI = [];             // [{id,datum,sifra,naziv,kolicina,cena,napomena}]
+
+const money = n => (Number(n)||0).toLocaleString('sr-RS',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' din.';
+const num = n => (Number(n)||0).toLocaleString('sr-RS',{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const todayISO = () => new Date().toISOString().slice(0,10);
+const fmtDate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return d && m && y ? `${d}.${m}.${y}.` : iso; };
+
+function rebuildIndex(){
+  ITEMS_BY_SIFRA = {};
+  ITEMS.forEach(it => ITEMS_BY_SIFRA[String(it.sifra)] = it);
+}
+
+/* Resolve free-text input (typed name, "NAZIV (Š123)" from datalist, or a bare code) to an item */
+function resolveItemInput(text){
+  if(!text) return null;
+  text = text.trim();
+  const m = text.match(/\(Š(\d+)\)\s*$/);
+  if(m) return ITEMS_BY_SIFRA[m[1]] || null;
+  if(/^\d+$/.test(text)) return ITEMS_BY_SIFRA[text] || null;
+  const low = text.toLowerCase();
+  const exact = ITEMS.find(it => it.naziv.toLowerCase() === low);
+  if(exact) return exact;
+  return null;
+}
+
+function buildDatalist(){
+  const dl = document.getElementById('itemsDatalist');
+  dl.innerHTML = ITEMS.map(it => `<option value="${escapeHtml(it.naziv)} (Š${it.sifra})">`).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ================= STORAGE =================
+   Uses the Claude artifact storage API (window.storage) when available.
+   Falls back to localStorage automatically when the file is opened on its
+   own outside claude.ai (e.g. downloaded and opened directly in a browser),
+   so the app keeps working and saving either way. */
+const hasClaudeStorage = () => typeof window.storage !== 'undefined'
+  && window.storage && typeof window.storage.get === 'function';
+
+async function loadState(){
+  ITEMS = await getJSON('sifrarnik_v1', null);
+  if(!ITEMS){
+    ITEMS = ITEMS_SEED.map(([sifra,naziv,cena]) => ({sifra,naziv,cena}));
+    await setJSON('sifrarnik_v1', ITEMS);
+  }
+  rebuildIndex();
+  LAGER = await getJSON('lager_v1', []);
+  OTPISI = await getJSON('otpisi_v1', []);
+  PRODAJA = await getJSON('prodaja_v1', []);
+  ZAKLJUCCI = await getJSON('zakljucci_v1', []);
+  UNI = await getJSON('univerzalna_v1', []);
+}
+
+async function getJSON(key, fallback){
+  if(hasClaudeStorage()){
+    try{
+      const res = await window.storage.get(key, false);
+      if(res && typeof res.value === 'string') return JSON.parse(res.value);
+      return fallback;
+    }catch(e){ return fallback; }
+  }
+  try{
+    const raw = localStorage.getItem('magicin_' + key);
+    return raw === null ? fallback : JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+async function setJSON(key, value){
+  if(hasClaudeStorage()){
+    try{ await window.storage.set(key, JSON.stringify(value), false); return; }
+    catch(e){ console.error('Greška pri čuvanju', key, e); }
+  }
+  try{ localStorage.setItem('magicin_' + key, JSON.stringify(value)); }
+  catch(e){ console.error('Greška pri čuvanju', key, e); }
+}
+
+const saveSifrarnik = () => setJSON('sifrarnik_v1', ITEMS);
+const saveLager = () => setJSON('lager_v1', LAGER);
+const saveOtpisi = () => setJSON('otpisi_v1', OTPISI);
+const saveProdaja = () => setJSON('prodaja_v1', PRODAJA);
+const saveZakljucci = () => setJSON('zakljucci_v1', ZAKLJUCCI);
+const saveUni = () => setJSON('univerzalna_v1', UNI);
+
+/* ================= NAV ================= */
+document.getElementById('nav').addEventListener('click', e => {
+  const item = e.target.closest('.nav-item');
+  if(!item) return;
+  showView(item.dataset.view);
+});
+
+/* ================= ACTIONS (event delegation, no inline onclick) ================= */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const action = el.dataset.action;
+  const id = el.dataset.id;
+  switch(action){
+    case 'print': window.print(); break;
+    case 'addArtikal': addArtikal(); break;
+    case 'addLagerStavka': addLagerStavka(); break;
+    case 'addOtpis': addOtpis(); break;
+    case 'addProdaja': addProdaja(); break;
+    case 'addUniverzalna': addUniverzalna(); break;
+    case 'deleteArtikal': deleteArtikal(parseInt(id, 10)); break;
+    case 'deleteLagerStavka': deleteLagerStavka(parseInt(id, 10)); break;
+    case 'deleteOtpisStavka': deleteOtpisStavka(id); break;
+    case 'deleteProdaja': deleteProdaja(id); break;
+    case 'deleteUniStavka': deleteUniStavka(id); break;
+  }
+});
+
+/* radnik select: show/hide the "drugi radnik" free-text field */
+document.getElementById('prodajaRadnik').addEventListener('change', e => {
+  document.getElementById('prodajaRadnikDrugiWrap').style.display = e.target.value === '__drugi' ? 'flex' : 'none';
+});
+
+/* inline "stvarno u kasi" input inside the daily summary table */
+document.addEventListener('change', e => {
+  if(e.target.matches('[data-stvarno-datum]')){
+    const datum = e.target.dataset.stvarnoDatum;
+    const val = e.target.value === '' ? null : parseFloat(e.target.value);
+    updateZakljucak(datum, val);
+  }
+});
+
+function showView(name){
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+}
+
+/* ================= PREGLED ================= */
+function renderPregled(){
+  const now = new Date();
+  document.getElementById('todayLabel').textContent = now.toLocaleDateString('sr-RS',{weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  const lagerVrednost = LAGER.reduce((s,l) => {
+    const it = ITEMS_BY_SIFRA[String(l.sifra)];
+    return s + (it ? it.cena * l.kolicina : 0);
+  }, 0);
+
+  const otpisMesecno = OTPISI.filter(o => (o.datum||'').slice(0,7) === todayISO().slice(0,7))
+    .reduce((s,o) => { const it = ITEMS_BY_SIFRA[String(o.sifra)]; return s + (it ? it.cena*o.kolicina : 0); }, 0);
+
+  const danasProdaje = PRODAJA.filter(p => p.datum === todayISO());
+  const pazarDanas = danasProdaje.reduce((s,p) => s + (Number(p.iznos)||0), 0);
+
+  const metrics = [
+    {label:'Artikala u šifarniku', value: ITEMS.length.toLocaleString('sr-RS'), sub:'ukupno u bazi', cls:''},
+    {label:'Vrednost lagera', value: money(lagerVrednost), sub:'radne zalihe', cls:''},
+    {label:'Otpis — ovaj mesec', value: money(otpisMesecno), sub:'evidentirana vrednost', cls:'rose'},
+    {label:'Pazar danas', value: money(pazarDanas), sub: danasProdaje.length ? `${danasProdaje.length} prodaje uneto` : 'još nije uneto', cls:''},
+  ];
+  document.getElementById('metricsGrid').innerHTML = metrics.map(m => `
+    <div class="metric">
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-value ${m.cls}">${m.value}</div>
+      <div class="metric-sub">${m.sub}</div>
+    </div>`).join('');
+}
+
+/* ================= SIFRARNIK ================= */
+function renderSifrarnik(filter){
+  filter = (filter||'').trim().toLowerCase();
+  const rows = ITEMS
+    .filter(it => !filter || it.naziv.toLowerCase().includes(filter) || String(it.sifra).includes(filter))
+    .sort((a,b) => a.sifra - b.sifra);
+
+  document.getElementById('sifrarnikCount').textContent = ITEMS.length.toLocaleString('sr-RS');
+  document.getElementById('printMetaSif').textContent = `Odštampano ${fmtDate(todayISO())} • ${rows.length} artikala`;
+
+  const body = document.getElementById('sifrarnikBody');
+  if(rows.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="4">Nema artikala koji odgovaraju pretrazi.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(it => `
+    <tr>
+      <td>${it.sifra}</td>
+      <td>${escapeHtml(it.naziv)}</td>
+      <td class="num">${num(it.cena)}</td>
+      <td class="no-print">
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" title="Obriši" data-action="deleteArtikal" data-id="${it.sifra}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function addArtikal(){
+  const sifraEl = document.getElementById('newSifra');
+  const nazivEl = document.getElementById('newNaziv');
+  const cenaEl = document.getElementById('newCena');
+  const msg = document.getElementById('sifrarnikMsg');
+
+  const sifra = parseInt(sifraEl.value, 10);
+  const naziv = nazivEl.value.trim();
+  const cena = parseFloat(cenaEl.value);
+
+  if(!sifra || !naziv || isNaN(cena)){
+    msg.textContent = 'Popunite šifru, naziv i cenu artikla.';
+    msg.className = 'hint bad';
+    return;
+  }
+  if(ITEMS_BY_SIFRA[String(sifra)]){
+    msg.textContent = `Šifra ${sifra} već postoji (${ITEMS_BY_SIFRA[String(sifra)].naziv}).`;
+    msg.className = 'hint bad';
+    return;
+  }
+  ITEMS.push({sifra, naziv, cena});
+  rebuildIndex();
+  buildDatalist();
+  saveSifrarnik();
+  sifraEl.value=''; nazivEl.value=''; cenaEl.value='';
+  msg.textContent = `Artikal "${naziv}" je dodat.`;
+  msg.className = 'hint ok';
+  document.getElementById('sifrarnikSearch').value='';
+  renderSifrarnik('');
+  renderPregled();
+}
+
+function deleteArtikal(sifra){
+  const it = ITEMS_BY_SIFRA[String(sifra)];
+  if(!it) return;
+  if(!confirm(`Obrisati artikal "${it.naziv}" (šifra ${sifra}) iz šifarnika?`)) return;
+  ITEMS = ITEMS.filter(x => x.sifra !== sifra);
+  rebuildIndex();
+  buildDatalist();
+  saveSifrarnik();
+  renderSifrarnik(document.getElementById('sifrarnikSearch').value);
+  renderPregled();
+}
+
+document.getElementById('sifrarnikSearch').addEventListener('input', e => renderSifrarnik(e.target.value));
+
+/* ================= LAGER ================= */
+function lagerHintUpdate(){
+  const el = document.getElementById('lagerArtikal');
+  const hint = document.getElementById('lagerHint');
+  const it = resolveItemInput(el.value);
+  if(!el.value){ hint.textContent=''; hint.className='hint'; return; }
+  if(it){ hint.textContent = `✓ ${it.naziv} • ${num(it.cena)} din.`; hint.className='hint ok'; }
+  else { hint.textContent = '✗ Artikal nije pronađen u šifarniku'; hint.className='hint bad'; }
+}
+document.getElementById('lagerArtikal').addEventListener('input', lagerHintUpdate);
+
+function addLagerStavka(){
+  const artEl = document.getElementById('lagerArtikal');
+  const kolEl = document.getElementById('lagerKolicina');
+  const it = resolveItemInput(artEl.value);
+  const kolicina = parseFloat(kolEl.value);
+  if(!it){ alert('Izaberite postojeći artikal iz šifarnika.'); return; }
+  if(isNaN(kolicina) || kolicina < 0){ alert('Unesite ispravnu količinu.'); return; }
+
+  const existing = LAGER.find(l => l.sifra === it.sifra);
+  if(existing) existing.kolicina = kolicina;
+  else LAGER.push({sifra: it.sifra, kolicina});
+
+  saveLager();
+  artEl.value=''; kolEl.value='';
+  document.getElementById('lagerHint').textContent='';
+  renderLager();
+  renderPregled();
+}
+
+function deleteLagerStavka(sifra){
+  LAGER = LAGER.filter(l => l.sifra !== sifra);
+  saveLager();
+  renderLager();
+  renderPregled();
+}
+
+function renderLager(){
+  const rows = LAGER
+    .map(l => ({...l, item: ITEMS_BY_SIFRA[String(l.sifra)]}))
+    .filter(r => r.item)
+    .sort((a,b) => a.item.naziv.localeCompare(b.item.naziv,'sr'));
+
+  document.getElementById('printMetaLager').textContent = `Odštampano ${fmtDate(todayISO())} • ${rows.length} stavki`;
+
+  const body = document.getElementById('lagerBody');
+  if(rows.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="6">Lager lista je prazna — unesite artikal i količinu iznad.</td></tr>`;
+  } else {
+    body.innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.item.sifra}</td>
+        <td>${escapeHtml(r.item.naziv)}</td>
+        <td class="num">${num(r.item.cena)}</td>
+        <td class="num">${num(r.kolicina)}</td>
+        <td class="num">${num(r.item.cena * r.kolicina)}</td>
+        <td class="no-print">
+          <button class="btn btn-ghost btn-sm" title="Ukloni" data-action="deleteLagerStavka" data-id="${r.sifra}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+  const total = rows.reduce((s,r) => s + r.item.cena * r.kolicina, 0);
+  document.getElementById('lagerTotal').textContent = money(total);
+}
+
+/* ================= OTPIS ================= */
+function otpisHintUpdate(){
+  const el = document.getElementById('otpisArtikal');
+  const hint = document.getElementById('otpisHint');
+  const it = resolveItemInput(el.value);
+  if(!el.value){ hint.textContent=''; hint.className='hint'; return; }
+  if(it){
+    const stanje = LAGER.find(l => l.sifra === it.sifra);
+    const kol = stanje ? stanje.kolicina : 0;
+    hint.textContent = `✓ ${it.naziv} • ${num(it.cena)} din. • na stanju: ${num(kol)}`;
+    hint.className='hint ok';
+  } else { hint.textContent = '✗ Artikal nije pronađen u šifarniku'; hint.className='hint bad'; }
+}
+document.getElementById('otpisArtikal').addEventListener('input', otpisHintUpdate);
+
+function addOtpis(){
+  const datumEl = document.getElementById('otpisDatum');
+  const artEl = document.getElementById('otpisArtikal');
+  const kolEl = document.getElementById('otpisKolicina');
+  const razlogEl = document.getElementById('otpisRazlog');
+
+  const it = resolveItemInput(artEl.value);
+  const kolicina = parseFloat(kolEl.value);
+  const datum = datumEl.value || todayISO();
+
+  if(!it){ alert('Izaberite postojeći artikal iz šifarnika.'); return; }
+  if(isNaN(kolicina) || kolicina <= 0){ alert('Unesite ispravnu količinu.'); return; }
+
+  OTPISI.push({id: uid(), datum, sifra: it.sifra, kolicina, razlog: razlogEl.value.trim()});
+  saveOtpisi();
+
+  const stanje = LAGER.find(l => l.sifra === it.sifra);
+  if(stanje){ stanje.kolicina = Math.max(0, stanje.kolicina - kolicina); saveLager(); }
+
+  artEl.value=''; kolEl.value=''; razlogEl.value='';
+  document.getElementById('otpisHint').textContent='';
+  renderOtpis();
+  renderLager();
+  renderPregled();
+}
+
+function deleteOtpisStavka(id){
+  const o = OTPISI.find(x => x.id === id);
+  if(!o) return;
+  if(!confirm('Obrisati ovu stavku otpisa? Količina će biti vraćena na lager.')) return;
+  OTPISI = OTPISI.filter(x => x.id !== id);
+  saveOtpisi();
+  const stanje = LAGER.find(l => l.sifra === o.sifra);
+  if(stanje){ stanje.kolicina += o.kolicina; saveLager(); }
+  renderOtpis();
+  renderLager();
+  renderPregled();
+}
+
+function renderOtpis(){
+  const rows = OTPISI
+    .map(o => ({...o, item: ITEMS_BY_SIFRA[String(o.sifra)]}))
+    .filter(r => r.item)
+    .sort((a,b) => (b.datum||'').localeCompare(a.datum||''));
+
+  document.getElementById('printMetaOtpis').textContent = `Odštampano ${fmtDate(todayISO())} • ${rows.length} stavki`;
+
+  const body = document.getElementById('otpisBody');
+  if(rows.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="8">Nema evidentiranih otpisa.</td></tr>`;
+  } else {
+    body.innerHTML = rows.map(r => `
+      <tr>
+        <td>${fmtDate(r.datum)}</td>
+        <td>${r.item.sifra}</td>
+        <td>${escapeHtml(r.item.naziv)}</td>
+        <td class="num">${num(r.kolicina)}</td>
+        <td class="num">${num(r.item.cena)}</td>
+        <td class="num">${num(r.item.cena * r.kolicina)}</td>
+        <td>${escapeHtml(r.razlog||'')}</td>
+        <td class="no-print">
+          <button class="btn btn-ghost btn-sm" title="Obriši" data-action="deleteOtpisStavka" data-id="${r.id}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+  const total = rows.reduce((s,r) => s + r.item.cena * r.kolicina, 0);
+  document.getElementById('otpisTotal').textContent = money(total);
+}
+
+/* ================= PRODAJA / DNEVNI PROMET ================= */
+function prodajaHintUpdate(){
+  const el = document.getElementById('prodajaArtikal');
+  const hint = document.getElementById('prodajaHint');
+  const cenaEl = document.getElementById('prodajaCena');
+  const it = resolveItemInput(el.value);
+  if(!el.value){ hint.textContent=''; hint.className='hint'; return; }
+  if(it){
+    const stanje = LAGER.find(l => l.sifra === it.sifra);
+    const kol = stanje ? stanje.kolicina : 0;
+    hint.textContent = `✓ ${it.naziv} • na stanju: ${num(kol)}`;
+    hint.className='hint ok';
+    if(cenaEl.value === '' || cenaEl.dataset.auto === '1'){
+      cenaEl.value = it.cena;
+      cenaEl.dataset.auto = '1';
+    }
+  } else { hint.textContent = '✗ Artikal nije pronađen u šifarniku'; hint.className='hint bad'; }
+}
+document.getElementById('prodajaArtikal').addEventListener('input', prodajaHintUpdate);
+document.getElementById('prodajaCena').addEventListener('input', e => { e.target.dataset.auto = '0'; });
+
+function currentRadnikValue(){
+  const sel = document.getElementById('prodajaRadnik');
+  if(sel.value === '__drugi'){
+    return document.getElementById('prodajaRadnikDrugi').value.trim();
+  }
+  return sel.value;
+}
+
+function addProdaja(){
+  const datumEl = document.getElementById('prodajaDatum');
+  const smenaEl = document.getElementById('prodajaSmena');
+  const artEl = document.getElementById('prodajaArtikal');
+  const kolEl = document.getElementById('prodajaKolicina');
+  const cenaEl = document.getElementById('prodajaCena');
+
+  const datum = datumEl.value || todayISO();
+  const radnik = currentRadnikValue();
+  const smena = smenaEl.value;
+  const it = resolveItemInput(artEl.value);
+  const kolicina = parseFloat(kolEl.value) || 1;
+  const cena = cenaEl.value === '' ? (it ? it.cena : NaN) : parseFloat(cenaEl.value);
+
+  if(!radnik){ alert('Izaberite ili unesite ime radnika.'); return; }
+  if(!it){ alert('Izaberite postojeći artikal iz šifarnika.'); return; }
+  if(isNaN(cena) || cena < 0){ alert('Unesite ispravnu cenu.'); return; }
+
+  PRODAJA.push({
+    id: uid(), datum, radnik, smena,
+    sifra: it.sifra, naziv: it.naziv, cena, kolicina,
+    iznos: cena * kolicina
+  });
+  saveProdaja();
+
+  const stanje = LAGER.find(l => l.sifra === it.sifra);
+  if(stanje){ stanje.kolicina = Math.max(0, stanje.kolicina - kolicina); saveLager(); }
+
+  artEl.value=''; kolEl.value='1'; cenaEl.value=''; cenaEl.dataset.auto='0';
+  document.getElementById('prodajaHint').textContent='';
+  renderProdaja();
+  renderPrometSummary();
+  renderLager();
+  renderPregled();
+}
+
+function deleteProdaja(id){
+  const p = PRODAJA.find(x => x.id === id);
+  if(!p) return;
+  if(!confirm('Obrisati ovu prodaju? Količina će biti vraćena na lager.')) return;
+  PRODAJA = PRODAJA.filter(x => x.id !== id);
+  saveProdaja();
+  const stanje = LAGER.find(l => l.sifra === p.sifra);
+  if(stanje){ stanje.kolicina += p.kolicina; saveLager(); }
+  renderProdaja();
+  renderPrometSummary();
+  renderLager();
+  renderPregled();
+}
+
+function updateZakljucak(datum, stvarno){
+  let z = ZAKLJUCCI.find(x => x.datum === datum);
+  if(!z){ z = {datum, stvarno}; ZAKLJUCCI.push(z); }
+  else { z.stvarno = stvarno; }
+  saveZakljucci();
+  renderPrometSummary();
+}
+
+function renderProdaja(){
+  const rows = [...PRODAJA].sort((a,b) => (b.datum||'').localeCompare(a.datum||'') || (b.id||'').localeCompare(a.id||''));
+  document.getElementById('printMetaPromet').textContent = `Odštampano ${fmtDate(todayISO())} • ${rows.length} prodaja`;
+
+  const body = document.getElementById('prodajaBody');
+  if(rows.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="9">Nema evidentiranih prodaja — dodajte prvu iznad.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${fmtDate(r.datum)}</td>
+      <td>${escapeHtml(r.radnik)}</td>
+      <td>${r.smena}. smena</td>
+      <td>${r.sifra}</td>
+      <td>${escapeHtml(r.naziv)}</td>
+      <td class="num">${num(r.kolicina)}</td>
+      <td class="num">${num(r.cena)}</td>
+      <td class="num">${num(r.iznos)}</td>
+      <td class="no-print">
+        <button class="btn btn-ghost btn-sm" title="Obriši" data-action="deleteProdaja" data-id="${r.id}">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderPrometSummary(){
+  const byDate = {};
+  PRODAJA.forEach(p => {
+    if(!byDate[p.datum]) byDate[p.datum] = {radnici1:new Set(), pazar1:0, radnici2:new Set(), pazar2:0};
+    const d = byDate[p.datum];
+    if(String(p.smena) === '1'){ d.radnici1.add(p.radnik); d.pazar1 += Number(p.iznos)||0; }
+    else { d.radnici2.add(p.radnik); d.pazar2 += Number(p.iznos)||0; }
+  });
+  ZAKLJUCCI.forEach(z => { if(!byDate[z.datum]) byDate[z.datum] = {radnici1:new Set(), pazar1:0, radnici2:new Set(), pazar2:0}; });
+
+  const dates = Object.keys(byDate).sort((a,b) => b.localeCompare(a));
+  const body = document.getElementById('prometSummaryBody');
+  if(dates.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="8">Nema podataka — unesite prvu prodaju iznad.</td></tr>`;
+  } else {
+    body.innerHTML = dates.map(datum => {
+      const d = byDate[datum];
+      const ukupno = d.pazar1 + d.pazar2;
+      const z = ZAKLJUCCI.find(x => x.datum === datum);
+      const stvarno = z ? z.stvarno : null;
+      const visak = (stvarno === null || stvarno === undefined) ? null : stvarno - ukupno;
+      return `
+      <tr>
+        <td>${fmtDate(datum)}</td>
+        <td>${escapeHtml([...d.radnici1].join(', '))}</td>
+        <td class="num">${num(d.pazar1)}</td>
+        <td>${escapeHtml([...d.radnici2].join(', '))}</td>
+        <td class="num">${num(d.pazar2)}</td>
+        <td class="num">${num(ukupno)}</td>
+        <td class="num no-print-input">
+          <input type="number" step="0.01" style="width:100px;text-align:right;" placeholder="0.00"
+                 value="${stvarno===null||stvarno===undefined?'':stvarno}" data-stvarno-datum="${datum}">
+        </td>
+        <td class="num ${visak===null?'':(visak<0?'neg':(visak>0?'pos':''))}">${visak===null ? '—' : num(visak)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  let t1=0, t2=0, tstv=0, tvisak=0;
+  dates.forEach(datum => {
+    const d = byDate[datum];
+    t1 += d.pazar1; t2 += d.pazar2;
+    const z = ZAKLJUCCI.find(x => x.datum === datum);
+    if(z && z.stvarno !== null && z.stvarno !== undefined){
+      tstv += Number(z.stvarno);
+      tvisak += Number(z.stvarno) - (d.pazar1 + d.pazar2);
+    }
+  });
+  document.getElementById('sumTotal1').textContent = num(t1);
+  document.getElementById('sumTotal2').textContent = num(t2);
+  document.getElementById('sumTotalUk').textContent = num(t1+t2);
+  document.getElementById('sumTotalStv').textContent = num(tstv);
+  document.getElementById('sumTotalVisak').textContent = num(tvisak);
+}
+
+/* ================= UNIVERZALNA ================= */
+function addUniverzalna(){
+  const datumEl = document.getElementById('uniDatum');
+  const artEl = document.getElementById('uniArtikal');
+  const kolEl = document.getElementById('uniKolicina');
+  const cenaEl = document.getElementById('uniCena');
+  const napEl = document.getElementById('uniNapomena');
+
+  const datum = datumEl.value || todayISO();
+  const it = resolveItemInput(artEl.value);
+  const kolicina = kolEl.value === '' ? null : parseFloat(kolEl.value);
+  let cena = cenaEl.value === '' ? null : parseFloat(cenaEl.value);
+  if(cena === null && it) cena = it.cena;
+
+  UNI.push({
+    id: uid(), datum,
+    sifra: it ? it.sifra : null,
+    naziv: it ? it.naziv : artEl.value.trim(),
+    kolicina, cena,
+    napomena: napEl.value.trim()
+  });
+  saveUni();
+
+  artEl.value=''; kolEl.value=''; cenaEl.value=''; napEl.value='';
+  renderUni();
+}
+
+function deleteUniStavka(id){
+  UNI = UNI.filter(x => x.id !== id);
+  saveUni();
+  renderUni();
+}
+
+function renderUni(){
+  const rows = [...UNI].sort((a,b) => (b.datum||'').localeCompare(a.datum||''));
+  document.getElementById('printMetaUni').textContent = `Odštampano ${fmtDate(todayISO())} • ${rows.length} redova`;
+
+  const body = document.getElementById('uniBody');
+  if(rows.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="8">Tabela je prazna — dodajte prvi red iznad.</td></tr>`;
+  } else {
+    body.innerHTML = rows.map(r => {
+      const iznos = (r.kolicina!==null && r.cena!==null) ? r.kolicina*r.cena : (r.cena!==null ? r.cena : null);
+      return `
+      <tr>
+        <td>${fmtDate(r.datum)}</td>
+        <td>${r.sifra ?? ''}</td>
+        <td>${escapeHtml(r.naziv||'')}</td>
+        <td class="num">${r.kolicina===null?'':num(r.kolicina)}</td>
+        <td class="num">${r.cena===null?'':num(r.cena)}</td>
+        <td class="num">${iznos===null?'':num(iznos)}</td>
+        <td>${escapeHtml(r.napomena||'')}</td>
+        <td class="no-print">
+          <button class="btn btn-ghost btn-sm" title="Obriši" data-action="deleteUniStavka" data-id="${r.id}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+  const total = rows.reduce((s,r) => {
+    const iznos = (r.kolicina!==null && r.cena!==null) ? r.kolicina*r.cena : (r.cena!==null ? r.cena : 0);
+    return s + (iznos||0);
+  }, 0);
+  document.getElementById('uniTotal').textContent = money(total);
+}
+
+/* ================= INIT ================= */
+async function init(){
+  document.getElementById('otpisDatum').value = todayISO();
+  document.getElementById('prodajaDatum').value = todayISO();
+  document.getElementById('uniDatum').value = todayISO();
+
+  await loadState();
+  buildDatalist();
+  renderPregled();
+  renderSifrarnik('');
+  renderLager();
+  renderOtpis();
+  renderProdaja();
+  renderPrometSummary();
+  renderUni();
+  showView('pregled');
+}
+init();
+</script>
+</body>
+</html>
