@@ -173,6 +173,8 @@
   .neg{color:var(--danger);}
   .pos{color:var(--primary);}
   .row-actions{display:flex;gap:4px;}
+  .edit-input{padding:5px 8px;font-size:13px;border:1px solid var(--primary);border-radius:6px;width:100%;}
+  tr.editing-row td{background:var(--gold-tint);}
   .empty-row td{padding:34px 12px;text-align:center;color:var(--faint);font-size:13px;}
 
   .search-wrap{position:relative;max-width:340px;}
@@ -902,6 +904,9 @@ document.addEventListener('click', e => {
     case 'addOtpis': addOtpis(); break;
     case 'addProdaja': addProdaja(); break;
     case 'addUniverzalna': addUniverzalna(); break;
+    case 'startArtikalEdit': startArtikalEdit(parseInt(id, 10)); break;
+    case 'saveArtikalEdit': saveArtikalEdit(parseInt(id, 10)); break;
+    case 'cancelArtikalEdit': cancelArtikalEdit(); break;
     case 'deleteArtikal': deleteArtikal(parseInt(id, 10)); break;
     case 'deleteLagerStavka': deleteLagerStavka(parseInt(id, 10)); break;
     case 'deleteOtpisStavka': deleteOtpisStavka(id); break;
@@ -1031,6 +1036,8 @@ function renderPregled(){
 }
 
 /* ================= SIFRARNIK ================= */
+let EDITING_SIFRA = null;
+
 function renderSifrarnik(filter){
   filter = (filter||'').trim().toLowerCase();
   const rows = ITEMS
@@ -1045,19 +1052,102 @@ function renderSifrarnik(filter){
     body.innerHTML = `<tr class="empty-row"><td colspan="4">Nema artikala koji odgovaraju pretrazi.</td></tr>`;
     return;
   }
-  body.innerHTML = rows.map(it => `
+  body.innerHTML = rows.map(it => {
+    if(EDITING_SIFRA === it.sifra){
+      return `
+      <tr class="editing-row">
+        <td colspan="4" style="padding:12px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="field">
+              <label>Šifra</label>
+              <div style="padding:8px 10px;font-weight:600;color:var(--muted);">${it.sifra}</div>
+            </div>
+            <div class="field grow">
+              <label>Naziv artikla</label>
+              <input type="text" class="edit-input" id="editNaziv" value="${escapeHtml(it.naziv)}">
+            </div>
+            <div class="field">
+              <label>Cena (bez PDV)</label>
+              <input type="number" step="0.01" class="edit-input" id="editCena" value="${it.cena}">
+            </div>
+            <div class="field" style="flex-direction:row;gap:8px;">
+              <button class="btn btn-primary btn-sm" title="Sačuvaj" data-action="saveArtikalEdit" data-id="${it.sifra}">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                Sačuvaj
+              </button>
+              <button class="btn btn-sm" title="Otkaži" data-action="cancelArtikalEdit">Otkaži</button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }
+    return `
     <tr>
       <td>${it.sifra}</td>
       <td>${escapeHtml(it.naziv)}</td>
       <td class="num">${num(it.cena)}</td>
       <td class="no-print">
         <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" title="Izmeni" data-action="startArtikalEdit" data-id="${it.sifra}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
           <button class="btn btn-ghost btn-sm" title="Obriši" data-action="deleteArtikal" data-id="${it.sifra}">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12"/></svg>
           </button>
         </div>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  if(EDITING_SIFRA !== null){
+    const nazivInput = document.getElementById('editNaziv');
+    if(nazivInput){
+      nazivInput.focus();
+      nazivInput.select();
+      nazivInput.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){ e.preventDefault(); saveArtikalEdit(EDITING_SIFRA); }
+        if(e.key === 'Escape'){ e.preventDefault(); cancelArtikalEdit(); }
+      });
+      const cenaInput = document.getElementById('editCena');
+      cenaInput.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){ e.preventDefault(); saveArtikalEdit(EDITING_SIFRA); }
+        if(e.key === 'Escape'){ e.preventDefault(); cancelArtikalEdit(); }
+      });
+    }
+  }
+}
+
+function startArtikalEdit(sifra){
+  EDITING_SIFRA = sifra;
+  renderSifrarnik(document.getElementById('sifrarnikSearch').value);
+}
+
+function cancelArtikalEdit(){
+  EDITING_SIFRA = null;
+  renderSifrarnik(document.getElementById('sifrarnikSearch').value);
+}
+
+function saveArtikalEdit(sifra){
+  const it = ITEMS_BY_SIFRA[String(sifra)];
+  if(!it) return;
+  const nazivEl = document.getElementById('editNaziv');
+  const cenaEl = document.getElementById('editCena');
+  const naziv = nazivEl.value.trim();
+  const cena = parseFloat(cenaEl.value);
+
+  if(!naziv || isNaN(cena) || cena < 0){
+    alert('Unesite ispravan naziv i cenu.');
+    return;
+  }
+  it.naziv = naziv;
+  it.cena = cena;
+  rebuildIndex();
+  buildDatalist();
+  saveSifrarnik();
+  EDITING_SIFRA = null;
+  renderSifrarnik(document.getElementById('sifrarnikSearch').value);
+  renderLager();
+  renderPregled();
 }
 
 function nextSifra(){
